@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosca Branca em Soja - NDE</title>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; line-height: 1.6; }
+        .container { width: 90%; max-width: 960px; margin: 0 auto; }
+        .header { background-color: #2c5e3A; color: white; padding: 2rem 0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 2.5rem; }
+        .header .sub-heading { margin: 0.5rem 0 0 0; font-size: 1.1rem; font-weight: 300; opacity: 0.9; }
+        .main-content { padding: 1.5rem 0; }
+        .card { background-color: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #555; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; -webkit-appearance: none; appearance: none; font-family: inherit; font-size: 1rem; }
+        .button { display: block; width: 100%; background-color: #007BFF; color: white; padding: 15px; text-decoration: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; border: none; cursor: pointer; text-align: center; margin-top: 1.5rem; -webkit-appearance: none; appearance: none; }
+        #resultado { margin-top: 1.5rem; padding: 1.5rem; background-color: #white; border: 1px solid #b3d7ff; border-radius: 8px; font-size: 1.8rem; color: #004085; text-align: center; min-height: 25px; transition: all 0.3s; word-wrap: break-word; font-weight: bold;}
+        .resultado-final-alerta { background-color: #white !important; border-color: #f5c6cb !important; color: #ff0000 !important; }
+        .resultado-final-ok { background-color: #white !important; border-color: #c3e6cb !important; color: #1e7e34 !important; }
+        fieldset { border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
+        legend { font-weight: bold; color: #555; padding: 0 0.5rem; }
+        .radio-option { display: flex; align-items: center; margin-bottom: 10px; }
+        .radio-option input[type="radio"] { width: auto; margin-right: 0.8rem; -webkit-appearance: radio; appearance: radio; }
+        .radio-option label { font-weight: normal; margin-bottom: 0; }
+        .footer { background-color: #333; color: white; text-align: center; padding: 1.5rem 0; margin-top: 2rem; }
+        @media (max-width: 600px) { .header h1 { font-size: 1.8rem; } .header .sub-heading { font-size: 1rem; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Mosca Branca em Soja</h1>
+            <p class="sub-heading">Decisão de controle por plano de amostragem convencional</p>
+        </div>
+    </header>
+
+    <main class="main-content container">
+        <section class="card" id="calculadora">
+            <h2> Determinação da tomada de decisão</h2>
+            <form id="nde-form">
+                <fieldset>
+                    
+                    <div class="form-group">
+                        <label for="tipo_producao">Produtividade esperada da lavoura</label>
+                        <select id="tipo_producao" name="tipo_producao">
+                            <option value="media">Usar o valor do sistema (sacas/ha)</option>
+                            <option value="manual">Digitar valor manualmente</option>
+                        </select>
+                        <input type="number" id="producao" name="producao" placeholder="Digite a produção em sc/ha" style="display:none; margin-top: 10px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo_preco">Preço da saca de soja</label>
+                        <select id="tipo_preco" name="tipo_preco">
+                            <option value="media">Usar o valor do sistema (R$/saca)</option>
+                            <option value="manual">Digitar valor manualmente</option>
+                        </select>
+                        <input type="number" id="preco_saca" name="preco_saca" step="0.01" placeholder="Digite o preço por saca (R$)" style="display:none; margin-top: 10px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tecnologia">Tecnologia de aplicação de inseticidas</label>
+                        <select id="tecnologia" name="tecnologia" required>
+                            <option value="" disabled selected>Selecione uma opção</option>
+                            <option value="trator">Trator</option>
+                            <option value="aviao">Avião</option>
+                            <option value="drone">Drone</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estágio da planta de soja</label>
+                        <div class="radio-option">
+                            <input type="radio" id="estagio_v" name="estagio" value="vegetativo" checked>
+                            <label for="estagio_v">Vegetativo</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="estagio_r" name="estagio" value="reprodutivo">
+                            <label for="estagio_r">Reprodutivo</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    
+                    <div class="form-group">
+                        <label for="densidade_praga">Densidade média da praga na amostragem (adultos/amostra)</label>
+                        <input type="number" step="0.1" id="densidade_praga" name="densidade_praga" placeholder="Ex: 5.5" required>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="button">Decisão recomendada</button>
+            </form>
+            <div id="resultado"></div>
+        </section>
+        
+        <section class="card" id="sobre">
+            <h2>Como amostrar a praga nos cultivos de soja?</h2>
+            <p style="text-align: justify;">Deve-se dividir a área dos cultivos em talhões uniformes.
+        Em cada talhão deve-se avaliar 49 plantas agitando o ápice das plantas em bandeja plástica branca (37x24x7cm).
+        Contar o número de adultos de mosca branca no fundo da bandeja.
+        Calcular o número médio de moscas branca nas 49 amostras.</p>
+        </section>
+    </main>
+    <footer class="footer">
+        <div class="container">
+             <p>&copy; Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const ndeForm = document.getElementById('nde-form');
+        const selectTecnologia = document.getElementById('tecnologia');
+        const resultadoDiv = document.getElementById('resultado');
+
+        const tipoProducaoSelect = document.getElementById('tipo_producao');
+        const producaoInput = document.getElementById('producao');
+        const tipoPrecoSelect = document.getElementById('tipo_preco');
+        const precoSacaInput = document.getElementById('preco_saca');
+        const densidadeInput = document.getElementById('densidade_praga');
+
+        let custo;
+
+        tipoProducaoSelect.addEventListener('change', function() {
+            producaoInput.style.display = (this.value === 'manual') ? 'block' : 'none';
+        });
+
+        tipoPrecoSelect.addEventListener('change', function() {
+            precoSacaInput.style.display = (this.value === 'manual') ? 'block' : 'none';
+        });
+
+        selectTecnologia.addEventListener('change', function() {
+            const valorSelecionado = this.value;
+            if (valorSelecionado === 'trator') custo = 380.30;
+            else if (valorSelecionado === 'aviao') custo = 402.08;
+            else if (valorSelecionado === 'drone') custo = 488.94;
+            else custo = undefined;
+        });
+
+        ndeForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            resultadoDiv.classList.remove('resultado-final-ok', 'resultado-final-alerta');
+
+            let producaoEsperada = 66.18;
+            if (tipoProducaoSelect.value === 'manual') {
+                producaoEsperada = parseFloat(producaoInput.value);
+            }
+
+            let precoSaca = 121.27;
+            if (tipoPrecoSelect.value === 'manual') {
+                precoSaca = parseFloat(precoSacaInput.value);
+            }
+
+            let estagioSelecionado = null;
+            const estagios = document.getElementsByName('estagio');
+            for (let i = 0; i < estagios.length; i++) {
+                if (estagios[i].checked) { estagioSelecionado = estagios[i].value; break; }
+            }
+            
+            const densidadePraga = parseFloat(densidadeInput.value);
+
+            if (!custo || !estagioSelecionado || isNaN(densidadePraga) || isNaN(producaoEsperada) || isNaN(precoSaca) || producaoEsperada <= 0 || precoSaca <= 0 || densidadePraga < 0) {
+                resultadoDiv.innerHTML = "Por favor, preencha todos os campos obrigatórios com valores válidos.";
+                return;
+            }
+
+            const pp_percentual = (custo*100) / ((producaoEsperada * precoSaca) * 0.8);
+            const pp_decimal = pp_percentual / 100;
+
+            let nde; 
+            if (estagioSelecionado === 'vegetativo') {
+                nde = ((pp_decimal) / 0.047)*0.429133858;
+            } else {
+                nde = ((pp_decimal) / 0.014)*0.429133858;
+            }
+
+            // 2. LÓGICA DO RESULTADO SIMPLIFICADA
+            if (densidadePraga >= nde) {
+                resultadoDiv.innerHTML = `Controlar a praga`;
+                resultadoDiv.classList.add('resultado-final-alerta');
+            } else {
+                resultadoDiv.innerHTML = `Não controlar a praga`;
+                resultadoDiv.classList.add('resultado-final-ok');
+            }
+        });
+
+    });
+    </script>
+</body>
+</html>
